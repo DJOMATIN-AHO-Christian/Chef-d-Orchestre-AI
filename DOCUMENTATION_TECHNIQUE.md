@@ -45,6 +45,6 @@ Le mode "multi-personne" (plusieurs squelettes détectés) active un flou CSS ma
 Le projet démontre qu'une interface homme-machine invisible et gestuelle peut être implémentée avec succès dans un environnement web. Les futures itérations pourraient inclure la reconnaissance de gestes spécifiques (gestaltes) pour contrôler des instruments différents.
 
 ---
-**Auteur** : IA Antigravity (Pair-programming avec l'utilisateur)  
+**Auteur** : DJOMATIN AHO Christian 
 **Dépôt** : [GitHub Repo](https://github.com/DJOMATIN-AHO-Christian/Chef-d-Orchestre-AI.git)  
 **Date** : 7 Février 2026
