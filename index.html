@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chef d'Orchestre AI - Musique Générative</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Load TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <!-- Load PoseNet -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
+    <!-- Load Tone.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <h1>Chef d'Orchestre AI</h1>
+            <p>Main droite : Volume | Main gauche : Hauteur (Pitch)</p>
+        </header>
+
+        <div class="video-container">
+            <video id="video" playsinline style="display: none;"></video>
+            <canvas id="canvas"></canvas>
+            <div id="status-overlay">
+                <div id="status-message">Chargement du modèle...</div>
+                <button id="start-btn" style="display: none;">DÉMARRER LA MUSIQUE</button>
+            </div>
+        </div>
+
+        <div id="debug-info">
+            <div class="debug-item">Volume: <span id="vol-val">-</span></div>
+            <div class="debug-item">Pitch: <span id="pitch-val">-</span></div>
+            <div class="debug-item">Personnes: <span id="count-val">0</span></div>
+        </div>
+
+        <div class="instructions">
+            <p>Bougez vos mains pour diriger l'orchestre invisible.</p>
+            <p class="multi-warning">Si plus d'une personne est détectée, le "flou artistique" s'active !</p>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
