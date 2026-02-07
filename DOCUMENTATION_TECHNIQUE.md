@@ -46,5 +46,6 @@ Le projet démontre qu'une interface homme-machine invisible et gestuelle peut �
 
 ---
 **Auteur** : DJOMATIN AHO Christian 
+
 **Dépôt** : [GitHub Repo](https://github.com/DJOMATIN-AHO-Christian/Chef-d-Orchestre-AI.git)  
 **Date** : 7 Février 2026
