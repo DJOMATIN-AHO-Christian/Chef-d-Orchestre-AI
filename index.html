@@ -4,41 +4,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chef d'Orchestre AI - Musique Générative</title>
+    <title>Chef d'Orchestre AI — Musique Générative par le Geste</title>
+    <meta name="description" content="Dirigez un orchestre virtuel avec vos mains grâce à l'IA et la vision par ordinateur.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- Load TensorFlow.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <!-- Load PoseNet -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
-    <!-- Load Tone.js -->
+    <!-- Tone.js only — TF/PoseNet loaded lazily -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 </head>
 
 <body>
+    <div id="bg-gradient"></div>
+
     <div id="app">
         <header>
-            <h1>Chef d'Orchestre AI</h1>
-            <p>Main droite : Volume | Main gauche : Hauteur (Pitch)</p>
+            <div class="logo-group">
+                <div class="logo-icon">🎼</div>
+                <h1>Chef d'Orchestre <span class="highlight">AI</span></h1>
+            </div>
+            <p class="subtitle">Dirigez la musique avec vos gestes</p>
         </header>
 
-        <div class="video-container">
-            <video id="video" playsinline style="display: none;"></video>
-            <canvas id="canvas"></canvas>
-            <div id="status-overlay">
-                <div id="status-message">Chargement du modèle...</div>
-                <button id="start-btn" style="display: none;">DÉMARRER LA MUSIQUE</button>
+        <main class="stage">
+            <div class="video-container" id="video-container">
+                <video id="video" playsinline style="display:none;"></video>
+                <canvas id="canvas"></canvas>
+                <canvas id="particle-canvas"></canvas>
+
+                <!-- Status Overlay -->
+                <div id="status-overlay">
+                    <div id="status-message">Prêt à jouer</div>
+                    <div class="start-buttons">
+                        <button id="demo-btn" class="start-button primary-btn">
+                            <span class="btn-icon">🖱️</span>
+                            MODE DÉMO (Souris)
+                        </button>
+                        <button id="camera-btn" class="start-button secondary-btn">
+                            <span class="btn-icon">📷</span>
+                            MODE CAMÉRA (IA)
+                        </button>
+                    </div>
+                    <p class="start-hint">Le mode démo fonctionne sans webcam</p>
+                </div>
+
+                <!-- HUD -->
+                <div class="hud-left" id="hud-left">
+                    <div class="hud-note" id="hud-note">—</div>
+                    <div class="hud-label">Note</div>
+                </div>
+                <div class="hud-right" id="hud-right">
+                    <div class="volume-bar-container">
+                        <div class="volume-bar-fill" id="volume-bar-fill"></div>
+                    </div>
+                    <div class="hud-label">Vol</div>
+                </div>
+                <div class="hud-top" id="hud-top">
+                    <span class="hud-scale-name" id="hud-scale-name">Pentatonique</span>
+                </div>
+                <div class="note-flash" id="note-flash"></div>
+            </div>
+
+            <!-- FFT -->
+            <div class="visualizer-container">
+                <canvas id="fft-canvas"></canvas>
+            </div>
+        </main>
+
+        <!-- Controls -->
+        <div class="controls-panel glass" id="controls-panel">
+            <div class="control-group">
+                <label for="scale-select">🎵 Gamme</label>
+                <select id="scale-select">
+                    <option value="pentatonic" selected>Pentatonique</option>
+                    <option value="major">Majeure</option>
+                    <option value="minor">Mineure</option>
+                    <option value="blues">Blues</option>
+                    <option value="dorian">Dorienne</option>
+                    <option value="chromatic">Chromatique</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="synth-select">🎹 Instrument</label>
+                <select id="synth-select">
+                    <option value="pad" selected>Pad</option>
+                    <option value="piano">Piano</option>
+                    <option value="lead">Lead</option>
+                    <option value="strings">Strings</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="tempo-slider">⏱ Tempo <span id="tempo-val">120</span></label>
+                <input type="range" id="tempo-slider" min="40" max="240" value="120">
+            </div>
+            <div class="control-group">
+                <label for="reverb-slider">🌊 Réverb <span id="reverb-val">25</span>%</label>
+                <input type="range" id="reverb-slider" min="0" max="100" value="25">
+            </div>
+            <div class="control-group">
+                <button id="mute-btn" class="icon-btn" title="Mute">🔊</button>
             </div>
         </div>
 
-        <div id="debug-info">
-            <div class="debug-item">Volume: <span id="vol-val">-</span></div>
-            <div class="debug-item">Pitch: <span id="pitch-val">-</span></div>
-            <div class="debug-item">Personnes: <span id="count-val">0</span></div>
+        <!-- Telemetry -->
+        <div class="telemetry glass" id="telemetry">
+            <div class="tel-item"><span class="tel-label">Vol</span><span class="tel-value" id="vol-val">—</span></div>
+            <div class="tel-item"><span class="tel-label">Freq</span><span class="tel-value" id="pitch-val">—</span></div>
+            <div class="tel-item"><span class="tel-label">Note</span><span class="tel-value" id="note-val">—</span></div>
+            <div class="tel-item"><span class="tel-label">Mode</span><span class="tel-value" id="mode-val">—</span></div>
+            <div class="tel-item"><span class="tel-label">FPS</span><span class="tel-value" id="fps-val">—</span></div>
         </div>
 
-        <div class="instructions">
-            <p>Bougez vos mains pour diriger l'orchestre invisible.</p>
-            <p class="multi-warning">Si plus d'une personne est détectée, le "flou artistique" s'active !</p>
+        <!-- Help -->
+        <div class="help-toast" id="help-toast">
+            <div class="help-icon">👋</div>
+            <p id="help-text">Déplacez la souris et cliquez pour jouer.</p>
+        </div>
+
+        <!-- Error -->
+        <div class="error-toast" id="error-toast" style="display:none;">
+            <div class="error-icon">⚠️</div>
+            <p id="error-message"></p>
         </div>
     </div>
 
