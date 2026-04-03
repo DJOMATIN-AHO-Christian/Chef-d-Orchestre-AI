@@ -1,11 +1,12 @@
 ---
 title: Chef d'Orchestre AI
-emoji: 🎼
 colorFrom: yellow
 colorTo: blue
 sdk: static
 pinned: false
 ---
+
+https://huggingface.co/spaces/DJO5555/Chef-d-Orchestre-AI
 
 # Chef d'Orchestre AI 🎼
 
