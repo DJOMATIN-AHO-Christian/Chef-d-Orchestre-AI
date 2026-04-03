@@ -8,7 +8,7 @@ pinned: false
 
 https://huggingface.co/spaces/DJO5555/Chef-d-Orchestre-AI
 
-# Chef d'Orchestre AI 🎼
+# Chef d'Orchestre AI 
 
 Dirigez un orchestre virtuel avec vos gestes grâce à l'IA et Tone.js.
 
